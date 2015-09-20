@@ -3,7 +3,9 @@
         "jquery",
         "vis",
         "alertifyjs",
-        "lodash"];
+        "lodash",
+        "mustache"
+    ];
     
     grunt.initConfig({
         connect: {
@@ -18,15 +20,21 @@
             options: {
               // Task-specific options go here. 
             },
-            all: {
+            vendor: {
                 src: [
                     "node_modules/bootstrap/dist/css/bootstrap.min.css",
                     "node_modules/alertifyjs/build/css/alertify.min.css",
                     "node_modules/alertifyjs/build/css/themes/bootstrap.min.css",
                     "node_modules/vis/dist/vis.min.css"
                 ],
-                dest: "dist/styles.css"
+                dest: "dist/vendor.css"
             },
+            app: {
+                src: [
+                    "css/index.css"
+                ],
+                dest: "dist/app.css"
+            }
         },
         browserify: {
             app: {
@@ -67,10 +75,10 @@
             },
             css: {
                 files: ["css/*.css"],
-                tasks: ["concat_css"]
+                tasks: ["concat_css:app"]
             },
             options: {
-                livereload: true,
+                livereload: true
             }         
         }
     });
@@ -82,5 +90,5 @@
 
     grunt.registerTask("default", ["connect", "watch"]);
     grunt.registerTask("css", ["concat_css"]);
-    grunt.registerTask("build", ["concat_css", "browserify:vendor", "browserify:app"]);
+    grunt.registerTask("build", ["concat_css", "browserify"]);
 };

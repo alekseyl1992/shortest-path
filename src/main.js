@@ -2,37 +2,55 @@ import $ from 'jquery';
 import vis from 'vis';
 import alertify from 'alertifyjs';
 
-function initVis() {
- 
-    var nodes = new vis.DataSet([
-        {id: 1, label: 'Node 1'},
-        {id: 2, label: 'Node 2'},
-        {id: 3, label: 'Node 3'},
-        {id: 4, label: 'Node 4'},
-        {id: 5, label: 'Node 5'}
-    ]);
+import Net from './net';
+import Edge from './edge';
+import Genetic from './genetic';
 
-    // create an array with edges
-    var edges = new vis.DataSet([
-        {from: 1, to: 3},
-        {from: 1, to: 2},
-        {from: 2, to: 4},
-        {from: 2, to: 5}
-    ]);
+import UI from './ui';
 
-    // create a network
-    var container = $('#net')[0];
+function start() {
+    var net = new Net([
+        new Edge(0, 1, 1),
+        new Edge(0, 2, 1),
+        new Edge(0, 3, 1),
 
-    // provide the data in the vis format
-    var data = {
-        nodes: nodes,
-        edges: edges
-    };
-    var options = {};
+        new Edge(1, 0, 1),
+        new Edge(1, 2, 1),
+        new Edge(1, 3, 1),
 
-    // initialize your network!
-    var network = new vis.Network(container, data, options);
+        new Edge(2, 1, 1),
+        new Edge(2, 0, 1),
+        new Edge(2, 3, 1),
+
+        new Edge(3, 1, 1),
+        new Edge(3, 2, 1),
+        new Edge(3, 0, 1)
+    ], 4);
+
+    var genetic = new Genetic(net, {
+        from: 0,
+        to: 3,
+        populationSize: 10,
+        crossoversCount: 10,
+        selectionCount: 5,
+        mutationProb: 0.1,
+        insertCount: 1,
+        removeCount: 1,
+        replaceCount: 1,
+        genomeMaxSize: 4
+    });
+
+    $(() => {
+        var ui = new UI();
+        ui.renderConfig({
+            config: genetic.config
+        });
+    });
+
+    for (var i = 0; i < 100; ++i)
+        genetic.step();
 }
 
-$(initVis);
+start();
+
 

@@ -3,19 +3,33 @@
     <title>Shortest path</title>
 
     <link rel="stylesheet" href="dist/styles.css">
-    
-    
-    
+    <link rel="stylesheet" href="dist/app.css">
     <script src="dist/vendor.js"></script>
     <script src="dist/app.js"></script>
 </head>
 
 <body>
-
-Some text here
-<div id="net">
+<div class="container-fluid">
+    <div class="row">
+        <div id="net" class="col-md-8">
+        </div>
+        <div id="panel" class="col-md-4">
+            <div id="config">
+                <script id="config-template" type="text/handlebars">
+                <table class="table">
+                    {{#each config}}
+                        <tr>
+                        <td>{{@key}}:</td>
+                        <td><input type="number" value="{{this}}" data-key="{{@key}}"></td>
+                        </tr>
+                    {{/each}}
+                </table>
+                </script>
+            </div>
+            <button id="start">Start</button>
+        </div>
+    </div>
 </div>
-
 </body>
 
 </html>
