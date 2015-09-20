@@ -4,7 +4,7 @@
         "vis",
         "alertifyjs",
         "lodash",
-        "mustache"
+        "handlebars"
     ];
     
     grunt.initConfig({
