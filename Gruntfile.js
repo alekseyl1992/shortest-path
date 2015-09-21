@@ -1,6 +1,7 @@
 ﻿module.exports = function (grunt) {
     var vendorLibs = [
         "jquery",
+        "bootstrap",
         "vis",
         "alertifyjs",
         "lodash",

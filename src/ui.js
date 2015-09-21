@@ -1,7 +1,12 @@
-import $ from 'jquery';
+var $ = require('jquery');
+window.$ = window.jQuery = $;
+
+import _ from 'lodash';
 import vis from 'vis';
 import alertify from 'alertifyjs';
 import handlebars from 'handlebars';
+
+import bootstrap from 'bootstrap';
 
 export default class UI {
     constructor() {
@@ -10,6 +15,14 @@ export default class UI {
         };
 
         this.$config = $('#config');
+        this.$start = $('#start');
+
+        this.$start.click(this.start.bind(this));
+
+        $('.nav-tabs a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
 
         this.initVis();
     }
@@ -55,9 +68,18 @@ export default class UI {
 
         this.$config.find('input').each((id, input) => {
             var $input = $(input);
-            config[$input.data['key']] = $input.val();
+            var val = parseFloat($input.val());
+            if (_.isNaN(val))
+                val = $input.val();
+
+            config[$input.data('key')] = val;
         });
 
         return config;
+    }
+
+    start() {
+        var config = this.getConfig();
+        console.log(config);
     }
 }

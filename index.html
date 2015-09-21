@@ -2,7 +2,7 @@
 <head>
     <title>Shortest path</title>
 
-    <link rel="stylesheet" href="dist/styles.css">
+    <link rel="stylesheet" href="dist/vendor.css">
     <link rel="stylesheet" href="dist/app.css">
     <script src="dist/vendor.js"></script>
     <script src="dist/app.js"></script>
@@ -14,19 +14,34 @@
         <div id="net" class="col-md-8">
         </div>
         <div id="panel" class="col-md-4">
-            <div id="config">
-                <script id="config-template" type="text/handlebars">
-                <table class="table">
-                    {{#each config}}
-                        <tr>
-                        <td>{{@key}}:</td>
-                        <td><input type="number" value="{{this}}" data-key="{{@key}}"></td>
-                        </tr>
-                    {{/each}}
-                </table>
-                </script>
+            <div>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#home" aria-controls="config" role="tab" data-toggle="tab">Config</a></li>
+                    <li role="presentation"><a href="#profile" aria-controls="log" role="tab" data-toggle="tab">Log</a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="config">
+                        <script id="config-template" type="text/handlebars">
+                        <table class="table">
+                            {{#each config}}
+                                <tr>
+                                <td>{{@key}}:</td>
+                                <td><input type="number" value="{{this}}" data-key="{{@key}}"></td>
+                                </tr>
+                            {{/each}}
+                        </table>
+                        </script>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="log">
+                        There will be log
+                    </div>
+                </div>
             </div>
             <button id="start">Start</button>
+            <button id="step">Step</button>
         </div>
     </div>
 </div>
