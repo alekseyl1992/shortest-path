@@ -1,6 +1,4 @@
-var $ = require('jquery');
-window.$ = window.jQuery = $;
-
+import $ from 'jquery';
 import vis from 'vis';
 import alertify from 'alertifyjs';
 

@@ -66,6 +66,14 @@
                 }
               }
         },
+        copy: {
+            vendor: {
+                expand: true,
+                cwd: './node_modules/vis/dist/',
+                src: ['img/**'],
+                dest: 'dist/'
+            }
+        },
         watch: {
             scripts: {
                 files: ["./src/*.js"],
@@ -88,8 +96,9 @@
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-concat-css');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt.registerTask("default", ["connect", "watch"]);
     grunt.registerTask("css", ["concat_css"]);
-    grunt.registerTask("build", ["concat_css", "browserify"]);
+    grunt.registerTask("build", ["concat_css", "browserify", "copy"]);
 };
