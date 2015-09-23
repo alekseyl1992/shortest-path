@@ -7,6 +7,9 @@ import vis from 'vis';
 import alertify from 'alertifyjs';
 import handlebars from 'handlebars';
 
+import Net from './net';
+import Edge from './edge';
+import Genetic from './genetic';
 
 export default class UI {
     constructor() {
@@ -16,8 +19,10 @@ export default class UI {
 
         this.$config = $('#config');
         this.$start = $('#start');
+        this.$step = $('#step');
 
         this.$start.click(this.start.bind(this));
+        this.$step.click(this.step.bind(this));
 
         $('.nav-tabs a').click(function (e) {
             e.preventDefault();
@@ -25,50 +30,108 @@ export default class UI {
         });
 
         this.initVis();
+
+        this.defaultConfig = {
+            from: 0,
+            to: 3,
+            populationSize: 10,
+            crossoversCount: 10,
+            selectionCount: 5,
+            mutationProb: 0.1,
+            insertCount: 1,
+            removeCount: 1,
+            replaceCount: 1,
+            genomeMaxSize: 4
+        };
+        this.renderConfig(this.defaultConfig);
     }
 
     initVis() {
-        var nodes = new vis.DataSet([
-            {id: 1, label: 'Node 1'},
-            {id: 2, label: 'Node 2'},
-            {id: 3, label: 'Node 3'},
-            {id: 4, label: 'Node 4'},
-            {id: 5, label: 'Node 5'}
-        ]);
+        this.nodes = new vis.DataSet([]);
+        this.edges = new vis.DataSet([]);
 
-        // create an array with edges
-        var edge = {from: 1, to: 3};
-        var edges = new vis.DataSet([
-            edge,
-            {from: 1, to: 2},
-            {from: 2, to: 4},
-            {from: 2, to: 5}
-        ]);
-
-        // create a network
         var container = $('#net')[0];
-
-        // provide the data in the vis format
-        var data = {
-            nodes: nodes,
-            edges: edges
-        };
-        var options = {
+        this.network = new vis.Network(container, {
+            nodes: this.nodes,
+            edges: this.edges
+        }, {
             manipulation: {
                 addNode: this.onEditNode.bind(this),
                 editNode: this.onEditNode.bind(this),
                 addEdge: this.onEditEdge.bind(this),
                 editEdge: this.onEditEdge.bind(this)
+            },
+            physics: false,
+            edges: {
+                smooth: {
+                    enabled: false
+                }
+            },
+            autoResize: true
+        });
+    }
+
+    start() {
+        var config = this.getConfig();
+
+        // create sequential ids
+        var seqId = 0;
+        _.each(this.nodes.get(), (node) => {
+            node.seqId = seqId++;
+            this.nodes.update(node);
+        });
+
+        _.each(this.edges.get(), (edge) => {
+            edge.cost = parseInt(edge.label) || 1;
+            edge.hash = Edge.getEdgeHash(this.nodes, edge);
+            this.edges.update(edge);
+        });
+
+        var nodesCount = this.nodes.length;
+        if (nodesCount == 0 || this.edges.length == 0) {
+            alertify.error('Should be at least one node and edge');
+            return;
+        }
+
+        this.net = new Net(this.edges, nodesCount);
+        this.genetic = new Genetic(this.net, config);
+
+        console.log('Genetic object created');
+    }
+
+    step () {
+        if (!this.genetic) {
+            alertify.error('Press start');
+            return;
+        }
+
+        this.genetic.step((ch) => {
+            // un-highlight all edges
+            _.each(this.edges.get(), (edge) => {
+                edge.width = 1;
+                this.edges.update(edge);
+            });
+
+            // highlight best path
+            var from = ch.config.from;
+            for (let i = 0; i < ch.path.length; ++i) {
+                var to = ch.path[i];
+
+                var edge = this.net.getEdge(from, to);
+                edge.width = 3;
+                this.edges.update(edge);
+
+                from = to;
             }
-        };
 
-        // initialize your network!
-        var network = new vis.Network(container, data, options);
-
-        setTimeout(() => {
+            // add last path part
+            to = ch.config.to;
+            edge = this.net.getEdge(from, to);
             edge.width = 3;
-            edges.update([edge]);
-        }, 2000);
+            this.edges.update(edge);
+        });
+
+
     }
 
     onEditNode (data, callback) {
@@ -84,7 +147,7 @@ export default class UI {
     }
 
     onEditEdge(data, callback) {
-        alertify.prompt("Enter edge weight", data.label,
+        alertify.prompt("Enter edge weight", parseInt(data.label) || 1,
             function(evt, value) {
                 data.label = value;
                 if (data.from == data.to) {
@@ -99,7 +162,9 @@ export default class UI {
     }
 
     renderConfig(config) {
-        var html = this.templates.config(config);
+        var html = this.templates.config({
+            config: config
+        });
         this.$config.html(html);
     }
 
@@ -116,10 +181,5 @@ export default class UI {
         });
 
         return config;
-    }
-
-    start() {
-        var config = this.getConfig();
-        console.log(config);
     }
 }
