@@ -43,8 +43,8 @@
                         <table class="table">
                             {{#each population}}
                                 <tr>
-                                <td>{{fitness}}:</td>
-                                <td>{{path}}</td>
+                                <td class="log__fitness">{{fitness}}:</td>
+                                <td class="log__path">{{path}}</td>
                                 </tr>
                             {{/each}}
                         </table>
@@ -52,11 +52,13 @@
                     </div>
                 </div>
             </div>
-            <button id="start">Start</button>
-            <button id="step">Step</button>
-            <br>
-            <button id="save">Save</button>
-            <button id="load">Load</button>
+            <button class="btn btn-default" id="start">Start</button>
+            <button class="btn btn-default" id="step">Step</button>
+            <button class="btn btn-default" id="burst">Burst</button>
+            <span class="pull-right">
+                <button class="btn btn-default" id="save">Save</button>
+                <button class="btn btn-default" id="load">Load</button>
+            </span>
         </div>
     </div>
 </div>

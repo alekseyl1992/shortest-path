@@ -22,9 +22,11 @@ export default class UI {
         this.$log = $('#log');
         this.$start = $('#start');
         this.$step = $('#step');
+        this.$burst = $('#burst');
 
         this.$start.click(this.start.bind(this));
         this.$step.click(this.step.bind(this));
+        this.$burst.click(this.burst.bind(this, 10));
 
         this.$save = $('#save');
         this.$load = $('#load');
@@ -151,6 +153,18 @@ export default class UI {
                 this.edges.update(edge);
             }
         });
+    }
+
+    burst(count) {
+        if (!this.genetic) {
+            alertify.error('Press start');
+            return;
+        }
+
+        _.times(count - 1, () => this.genetic.step(_.noop));
+
+        // visualize last step only
+        this.step();
     }
 
     save() {
