@@ -98,7 +98,7 @@
     grunt.loadNpmTasks('grunt-concat-css');
     grunt.loadNpmTasks('grunt-contrib-copy');
 
-    grunt.registerTask("default", ["connect", "watch"]);
+    grunt.registerTask("default", ["concat_css:app", "browserify:app", "connect", "watch"]);
     grunt.registerTask("css", ["concat_css"]);
     grunt.registerTask("build", ["concat_css", "browserify", "copy"]);
 };

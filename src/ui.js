@@ -24,6 +24,11 @@ export default class UI {
         this.$start.click(this.start.bind(this));
         this.$step.click(this.step.bind(this));
 
+        this.$save = $('#save');
+        this.$load = $('#load');
+        this.$save.click(this.save.bind(this));
+        this.$load.click(this.load.bind(this));
+
         $('.nav-tabs a').click(function (e) {
             e.preventDefault();
             $(this).tab('show');
@@ -46,9 +51,9 @@ export default class UI {
         this.renderConfig(this.defaultConfig);
     }
 
-    initVis() {
-        this.nodes = new vis.DataSet([]);
-        this.edges = new vis.DataSet([]);
+    initVis(nodes, edges) {
+        this.nodes = new vis.DataSet(nodes);
+        this.edges = new vis.DataSet(edges);
 
         var container = $('#net')[0];
         this.network = new vis.Network(container, {
@@ -77,6 +82,13 @@ export default class UI {
         // create sequential ids
         var seqId = 0;
         _.each(this.nodes.get(), (node) => {
+            if (node.label == config.from) {
+                config.from = seqId;
+            }
+            if (node.label == config.to) {
+                config.to = seqId;
+            }
+
             node.seqId = seqId++;
             this.nodes.update(node);
         });
@@ -118,8 +130,10 @@ export default class UI {
                 var to = ch.path[i];
 
                 var edge = this.net.getEdge(from, to);
-                edge.width = 3;
-                this.edges.update(edge);
+                if (edge) {
+                    edge.width = 3;
+                    this.edges.update(edge);
+                }
 
                 from = to;
             }
@@ -127,11 +141,26 @@ export default class UI {
             // add last path part
             to = ch.config.to;
             edge = this.net.getEdge(from, to);
-            edge.width = 3;
-            this.edges.update(edge);
+            if (edge) {
+                edge.width = 3;
+                this.edges.update(edge);
+            }
         });
+    }
 
+    save() {
+        this.network.storePositions();
+        window.localStorage.setItem('nodes', JSON.stringify(this.nodes.get()));
+        window.localStorage.setItem('edges', JSON.stringify(this.edges.get()));
+        window.localStorage.setItem('config', JSON.stringify(this.getConfig()));
+    }
 
+    load() {
+        var nodes = JSON.parse(window.localStorage.getItem('nodes'));
+        var edges = JSON.parse(window.localStorage.getItem('edges'));
+        var config = JSON.parse(window.localStorage.getItem('config'));
+        this.initVis(nodes, edges);
+        this.renderConfig(config);
     }
 
     onEditNode (data, callback) {
