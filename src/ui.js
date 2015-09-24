@@ -14,10 +14,12 @@ import Genetic from './genetic';
 export default class UI {
     constructor() {
         this.templates = {
-            config: handlebars.compile($('#config-template').html())
+            config: handlebars.compile($('#config-template').html()),
+            log: handlebars.compile($('#log-template').html())
         };
 
         this.$config = $('#config');
+        this.$log = $('#log');
         this.$start = $('#start');
         this.$step = $('#step');
 
@@ -37,8 +39,8 @@ export default class UI {
         this.initVis();
 
         this.defaultConfig = {
-            from: 0,
-            to: 3,
+            from: '',
+            to: '',
             populationSize: 10,
             crossoversCount: 10,
             selectionCount: 5,
@@ -46,7 +48,7 @@ export default class UI {
             insertCount: 1,
             removeCount: 1,
             replaceCount: 1,
-            genomeMaxSize: 4
+            genomeMaxSize: ''
         };
         this.renderConfig(this.defaultConfig);
     }
@@ -82,10 +84,10 @@ export default class UI {
         // create sequential ids
         var seqId = 0;
         _.each(this.nodes.get(), (node) => {
-            if (node.label == config.from) {
+            if (node.label === config.from) {
                 config.from = seqId;
             }
-            if (node.label == config.to) {
+            if (node.label === config.to) {
                 config.to = seqId;
             }
 
@@ -105,9 +107,13 @@ export default class UI {
             return;
         }
 
+        if (config.genomeMaxSize == '')
+            config.genomeMaxSize = nodesCount - 2;
+
         this.net = new Net(this.edges, nodesCount);
         this.genetic = new Genetic(this.net, config);
 
+        this.unhighlight();
         console.log('Genetic object created');
     }
 
@@ -117,12 +123,11 @@ export default class UI {
             return;
         }
 
-        this.genetic.step((ch) => {
-            // un-highlight all edges
-            _.each(this.edges.get(), (edge) => {
-                edge.width = 1;
-                this.edges.update(edge);
-            });
+        this.genetic.step((population) => {
+            this.unhighlight();
+            this.log(population);
+
+            var ch = population[0];
 
             // highlight best path
             var from = ch.config.from;
@@ -161,6 +166,20 @@ export default class UI {
         var config = JSON.parse(window.localStorage.getItem('config'));
         this.initVis(nodes, edges);
         this.renderConfig(config);
+    }
+
+    unhighlight() {
+        _.each(this.edges.get(), (edge) => {
+            edge.width = 1;
+            this.edges.update(edge);
+        });
+    }
+
+    log (population) {
+        var html = this.templates.log({
+            population: population
+        });
+        this.$log.html(html);
     }
 
     onEditNode (data, callback) {

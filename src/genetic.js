@@ -18,7 +18,7 @@ export default class Genetic {
     step(visualize) {
         //TODO: bin heap?
         this.population = _.sortByAll(this.population, ['fitness', (ch) => ch.path.length ]);
-        visualize(this.population[0]);
+        visualize(this.population);
 
         let children = [];
 

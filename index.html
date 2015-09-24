@@ -32,14 +32,23 @@
                             {{#each config}}
                                 <tr>
                                 <td>{{@key}}:</td>
-                                <td><input type="number" value="{{this}}" data-key="{{@key}}"></td>
+                                <td><input type="text" value="{{this}}" data-key="{{@key}}"></td>
                                 </tr>
                             {{/each}}
                         </table>
                         </script>
                     </div>
                     <div role="tabpanel" class="tab-pane" id="log">
-                        There will be log
+                        <script id="log-template" type="text/handlebars">
+                        <table class="table">
+                            {{#each population}}
+                                <tr>
+                                <td>{{fitness}}:</td>
+                                <td>{{path}}</td>
+                                </tr>
+                            {{/each}}
+                        </table>
+                        </script>
                     </div>
                 </div>
             </div>
