@@ -44,7 +44,11 @@
                             {{#each population}}
                                 <tr>
                                 <td class="log__fitness">{{fitness}}:</td>
-                                <td class="log__path">{{path}}</td>
+                                <td class="log__path">
+                                {{#each path}}
+                                    {{label}},
+                                {{/each}}
+                                </td>
                                 </tr>
                             {{/each}}
                         </table>

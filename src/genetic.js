@@ -9,7 +9,7 @@ export default class Genetic {
 
         this.population = [];
         for (let i = 0; i < config.populationSize; ++i) {
-            let ch = new Chromosome(net.nodesCount, config);
+            let ch = new Chromosome(config);
             ch.evalFitness(this);
             this.population.push(ch);
         }
@@ -29,7 +29,7 @@ export default class Genetic {
             let child = this.population[ch1].crossover(this.population[ch2]);
 
             if (_.random(0, 1, true) > this.config.mutationProb)
-                child.mutate(this.config);
+                child.mutate();
 
             child.evalFitness(this);
             children.push(child);
@@ -55,6 +55,10 @@ export default class Genetic {
         }
 
         this.population = newPopulation;
+    }
+
+    recalcFitness() {
+        _.each(this.population, (ch) => ch.evalFitness(this, true));
     }
 
     log() {

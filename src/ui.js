@@ -8,7 +8,6 @@ import alertify from 'alertifyjs';
 import handlebars from 'handlebars';
 
 import Net from './net';
-import Edge from './edge';
 import Genetic from './genetic';
 
 export default class UI {
@@ -82,38 +81,37 @@ export default class UI {
 
     start() {
         var config = this.getConfig();
+        config.edges = this.edges;
+        config.nodes = this.nodes;
 
-        // create sequential ids
-        var seqId = 0;
         _.each(this.nodes.get(), (node) => {
             if (node.label === config.from) {
-                config.from = seqId;
+                config.from = node;
             }
             if (node.label === config.to) {
-                config.to = seqId;
+                config.to = node;
             }
-
-            node.seqId = seqId++;
-            this.nodes.update(node);
         });
 
         _.each(this.edges.get(), (edge) => {
             edge.cost = parseInt(edge.label) || 1;
-            edge.hash = Edge.getEdgeHash(this.nodes, edge);
             this.edges.update(edge);
         });
 
-        var nodesCount = this.nodes.length;
-        if (nodesCount == 0 || this.edges.length == 0) {
+        config.nodesCount = this.nodes.length;
+        if (config.nodesCount == 0 || this.edges.length == 0) {
             alertify.error('Should be at least one node and edge');
             return;
         }
 
         if (config.genomeMaxSize == '')
-            config.genomeMaxSize = nodesCount - 2;
+            config.genomeMaxSize = config.nodesCount - 2;
 
-        this.net = new Net(this.edges, nodesCount);
+        this.net = new Net(this.edges);
         this.genetic = new Genetic(this.net, config);
+
+        // recalculate fitness for whole population on topology change
+        this.edges.on('*', () => this.genetic.recalcFitness());
 
         this.unhighlight();
         console.log('Genetic object created');
@@ -212,6 +210,8 @@ export default class UI {
         alertify.prompt("Enter edge weight", parseInt(data.label) || 1,
             function(evt, value) {
                 data.label = value;
+                data.cost = parseInt(data.label) || 1;
+
                 if (data.from == data.to) {
                     var r = confirm("Do you want to connect the node to itself?");
                     if (r == true) {

@@ -1,20 +1,13 @@
 import _ from 'lodash';
-import Edge from './edge';
 
 export default class Net {
-    constructor(edges, nodesCount) {
+    constructor(edges) {
         this.edges = edges;
-        this.edgesMap = {};
-
-        _.each(edges.get(), (edge) => {
-            this.edgesMap[edge.hash] = edge;
-        });
-
-        this.nodesCount = nodesCount;
     }
 
     getEdgeCost(from, to) {
         var edge = this.getEdge(from, to);
+        edge && console.log(edge.cost);
         if (edge)
             return edge.cost;
         else
@@ -22,7 +15,11 @@ export default class Net {
     }
 
     getEdge(from, to) {
-        var hash = Edge.getPairHash([from, to]);
-        return this.edgesMap[hash];
+        var arr = this.edges.get({
+            filter: (item) => (item.from == from.id && item.to == to.id) ||
+                (item.to == from.id && item.from == to.id)
+        });
+
+        return arr[0];
     }
 }

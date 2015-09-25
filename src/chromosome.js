@@ -1,8 +1,7 @@
 import _ from 'lodash';
 
 export default class Chromosome {
-    constructor(nodesCount, config) {
-        this.nodesCount = nodesCount;
+    constructor(config) {
         this.config = config;
         this.path = [];
         this.fitness = 0;
@@ -11,7 +10,8 @@ export default class Chromosome {
         var genomeSize = _.random(0, config.genomeMaxSize);
         for (let i = 0; i < genomeSize; ++i) {
             do {
-                var node = _.random(0, nodesCount - 1)
+                var nodeId = _.random(0, config.nodesCount - 1);
+                var node = config.nodes.get()[nodeId];
             } while(_.contains(this.path, node));
 
             this.path.push(node);
@@ -19,7 +19,7 @@ export default class Chromosome {
     }
 
     crossover(another) {
-        var result = new Chromosome(this.nodesCount, this.config);
+        var result = new Chromosome(this.config);
         var chromosomes = [this, another];
 
         var sourceId = _.random(0, 1);
@@ -46,38 +46,40 @@ export default class Chromosome {
         return result;
     }
 
-    mutate(config) {
+    mutate() {
         this.fitness = 0;  // reset fitness
 
-        for (let i = 0; i < config.insertCount; ++i) {
+        for (let i = 0; i < this.config.insertCount; ++i) {
             const pos = _.random(0, this.path.length - 1);
-            const node = _.random(0, this.nodesCount - 1);
+            const node = _.random(0, this.config.nodesCount - 1);
 
             this.path.splice(pos, 0, node);
         }
 
-        for (let i = 0; i < config.removeCount; ++i) {
+        for (let i = 0; i < this.config.removeCount; ++i) {
             const pos = _.random(0, this.path.length - 1);
             this.path.splice(pos, 1);
         }
 
-        for (let i = 0; i < config.replaceCount; ++i) {
+        for (let i = 0; i < this.config.replaceCount; ++i) {
             const pos = _.random(0, this.path.length - 1);
-            const node = _.random(0, this.nodesCount - 1);
+            const nodeId = _.random(0, this.config.nodesCount - 1);
+            const node = this.config.nodes.get()[nodeId];
 
             this.path[pos] = node;
         }
     }
 
-    evalFitness(genetic) {
-        if (this.fitness)
+    evalFitness(genetic, noCache) {
+        if (this.fitness && !noCache)
             return this.fitness;
 
+        this.fitness = 0;
         var from = this.config.from;
         for (let i = 0; i < this.path.length; ++i) {
             var to = this.path[i];
 
-            const cost = genetic.net.getEdgeCost(from, to);
+            let cost = genetic.net.getEdgeCost(from, to);
             this.fitness += cost;
 
             from = to;
@@ -85,7 +87,7 @@ export default class Chromosome {
 
         // add last path part
         to = this.config.to;
-        const cost = genetic.net.getEdgeCost(from, to);
+        let cost = genetic.net.getEdgeCost(from, to);
         this.fitness += cost;
 
         return this.fitness;
