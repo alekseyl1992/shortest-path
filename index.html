@@ -41,13 +41,15 @@
                     <div role="tabpanel" class="tab-pane log" id="log">
                         <script id="log-template" type="text/handlebars">
                         <table class="table">
-                            {{#each population}}
+                           {{#each population}}
                                 <tr>
                                 <td class="log__fitness">{{fitness}}:</td>
                                 <td class="log__path">
+                                {{../from}},
                                 {{#each path}}
                                     {{label}},
                                 {{/each}}
+                                {{../to}}
                                 </td>
                                 </tr>
                             {{/each}}

@@ -16,7 +16,6 @@ export default class Genetic {
     }
 
     step(visualize) {
-        //TODO: bin heap?
         this.population = _.sortByAll(this.population, ['fitness', (ch) => ch.path.length ]);
         visualize(this.population);
 
@@ -59,17 +58,5 @@ export default class Genetic {
 
     recalcFitness() {
         _.each(this.population, (ch) => ch.evalFitness(this, true));
-    }
-
-    log() {
-        var ch = this.population[0];
-
-        var str = ch.fitness + ': ' + this.config.from;
-        _.each(ch.path, (node) => {
-            str += node;
-        });
-        str += this.config.to;
-
-        console.log(str);
     }
 }

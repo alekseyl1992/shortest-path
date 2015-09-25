@@ -46,9 +46,9 @@ export default class UI {
             crossoversCount: 10,
             selectionCount: 5,
             mutationProb: 0.1,
-            insertCount: 1,
-            removeCount: 1,
-            replaceCount: 1,
+            insertPercent: 0.5,
+            removePercent: 0.5,
+            replacePercent: 0.5,
             genomeMaxSize: ''
         };
         this.renderConfig(this.defaultConfig);
@@ -189,7 +189,9 @@ export default class UI {
 
     log (population) {
         var html = this.templates.log({
-            population: population
+            population: population,
+            from: this.config.from,
+            to: this.config.to
         });
         this.$log.html(html);
     }
@@ -224,6 +226,7 @@ export default class UI {
     }
 
     renderConfig(config) {
+        this.config = config;
         var html = this.templates.config({
             config: config
         });

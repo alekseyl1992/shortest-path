@@ -49,19 +49,20 @@ export default class Chromosome {
     mutate() {
         this.fitness = 0;  // reset fitness
 
-        for (let i = 0; i < this.config.insertCount; ++i) {
+        for (let i = 0; i < this.path.length * this.config.insertPercent; ++i) {
             const pos = _.random(0, this.path.length - 1);
-            const node = _.random(0, this.config.nodesCount - 1);
+            const nodeId = _.random(0, this.config.nodesCount - 1);
+            const node = this.config.nodes.get()[nodeId];
 
             this.path.splice(pos, 0, node);
         }
 
-        for (let i = 0; i < this.config.removeCount; ++i) {
+        for (let i = 0; i < this.path.length * this.config.removePercent; ++i) {
             const pos = _.random(0, this.path.length - 1);
             this.path.splice(pos, 1);
         }
 
-        for (let i = 0; i < this.config.replaceCount; ++i) {
+        for (let i = 0; i < this.path.length * this.config.replacePercent; ++i) {
             const pos = _.random(0, this.path.length - 1);
             const nodeId = _.random(0, this.config.nodesCount - 1);
             const node = this.config.nodes.get()[nodeId];
