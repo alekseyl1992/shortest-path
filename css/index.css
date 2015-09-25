@@ -6,3 +6,8 @@
 .log__path {
     width: 70%;
 }
+
+.log {
+    height: 80%;
+    overflow: auto;
+ }
