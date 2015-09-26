@@ -1,10 +1,13 @@
 import _ from 'lodash';
 
 export default class Chromosome {
-    constructor(config) {
+    constructor(config, empty) {
         this.config = config;
         this.path = [];
         this.fitness = 0;
+
+        if (empty)
+            return;
 
         // random genome
         var genomeSize = _.random(0, config.genomeMaxSize);
@@ -19,8 +22,12 @@ export default class Chromosome {
     }
 
     crossover(another) {
-        var result = new Chromosome(this.config);
+        var result = new Chromosome(this.config, true);
         var chromosomes = [this, another];
+
+        // copy positions
+        chromosomes[0].pos = 0;
+        chromosomes[1].pos = 0;
 
         var sourceId = _.random(0, 1);
         var source = chromosomes[sourceId];
@@ -31,12 +38,17 @@ export default class Chromosome {
         var resultLen = _.random(minLen, maxLen);
 
         while (result.path.length < resultLen) {
-            var partLen = _.random(0, resultLen - result.path.length);
-            if (partLen + result.path.length > source.path.length)
-                partLen = source.path.length - result.path.length;
+            var partLen = _.random(0, resultLen);
+            if (partLen + result.path.length > resultLen)
+                partLen -= resultLen - result.path.length;
+
+            var sourceRestLen = source.path.length - source.pos;
+
+            if (partLen > sourceRestLen)
+                partLen = sourceRestLen;
 
             for (let i = 0; i < partLen; ++i) {
-                result.path.push(source.path[i]);
+                result.path.push(source.path[source.pos++]);
             }
 
             sourceId = +!sourceId;
