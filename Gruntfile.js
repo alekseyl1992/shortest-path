@@ -5,7 +5,8 @@
         "vis",
         "alertifyjs",
         "lodash",
-        "handlebars"
+        "handlebars",
+        "flot"
     ];
     
     grunt.initConfig({
@@ -55,6 +56,23 @@
                     "./dist/app.js": ["./src/main.js"]
                 }                
             },
+            experiment: {
+                options: {
+                    transform: [
+                        ["babelify", {
+                            loose: "all"
+                        }]
+                    ],
+                    browserifyOptions: {
+                        debug: true
+                    },
+                    debug: true,
+                    external: vendorLibs
+                },
+                files: {
+                    "./dist/experiment.js": ["./src/experiment.js"]
+                }
+            },
             vendor: {
                 // External modules that don't need to be constantly re-compiled
                 src: ['.'],
@@ -77,7 +95,7 @@
         watch: {
             scripts: {
                 files: ["./src/*.js"],
-                tasks: ["browserify:app"]
+                tasks: ["browserify:app", "browserify:experiment"]
             },
             html: {
                 files: ["*.html"]
@@ -89,6 +107,11 @@
             options: {
                 livereload: true
             }         
+        },
+        execute: {
+            experiment: {
+                src: ['./dist/experiment.js']
+            }
         }
     });
 
@@ -97,8 +120,16 @@
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-concat-css');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-execute');
 
-    grunt.registerTask("default", ["concat_css:app", "browserify:app", "connect", "watch"]);
+    grunt.registerTask("default", [
+        "concat_css:app",
+        "browserify:app",
+        "browserify:experiment",
+        "connect",
+        "watch"]);
+
     grunt.registerTask("css", ["concat_css"]);
     grunt.registerTask("build", ["concat_css", "browserify", "copy"]);
+    grunt.registerTask("experiment", ["browserify:experiment", "execute:experiment"]);
 };

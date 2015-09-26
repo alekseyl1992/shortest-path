@@ -6,6 +6,7 @@ export default class Genetic {
     constructor(net, config) {
         this.net = net;
         this.config = config;
+        this.stepsCount = 0;
 
         this.population = [];
         for (let i = 0; i < config.populationSize; ++i) {
@@ -20,6 +21,7 @@ export default class Genetic {
         visualize(this.population);
 
         let children = [];
+        let has = (population, newCh) => _.any(population, (ch) => _.eq(ch.path, newCh.path));
 
         for (let i = 0; i < this.config.crossoversCount; ++i) {
             var ch1 = _.random(0, this.config.selectionCount - 1);
@@ -27,8 +29,14 @@ export default class Genetic {
 
             let child = this.population[ch1].crossover(this.population[ch2]);
 
-            if (_.random(0, 1, true) > this.config.mutationProb)
+            if (_.random(0, 1, true) < this.config.mutationProb)
                 child.mutate();
+
+            if (this.config.mutateDuplicates &&
+                (has(children, child) || has(this.population, child))) {
+
+                child.mutate();
+            }
 
             child.evalFitness(this);
             children.push(child);
@@ -41,19 +49,23 @@ export default class Genetic {
         let parentId = 0;
         let childId = 0;
 
+
         while (newPopulation.length < this.population.length) {
             if (childId >= children.length ||
                 this.population[parentId].fitness < children[childId].fitness) {
 
-                newPopulation.push(this.population[parentId]);
+                let ch = this.population[parentId];
+                newPopulation.push(ch);
                 ++parentId;
             } else {
-                newPopulation.push(children[childId]);
+                let ch = children[childId];
+                newPopulation.push(ch);
                 ++childId;
             }
         }
 
         this.population = newPopulation;
+        this.stepsCount++;
     }
 
     recalcFitness() {

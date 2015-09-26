@@ -25,8 +25,8 @@ export default class Chromosome {
         var sourceId = _.random(0, 1);
         var source = chromosomes[sourceId];
 
-        var minLen = _.min([this.length, another.length]);
-        var maxLen = _.max([this.length, another.length]);
+        var minLen = _.min([this.path.length, another.path.length]);
+        var maxLen = _.max([this.path.length, another.path.length]);
 
         var resultLen = _.random(minLen, maxLen);
 
@@ -39,7 +39,7 @@ export default class Chromosome {
                 result.path.push(source.path[i]);
             }
 
-            sourceId = !sourceId;
+            sourceId = +!sourceId;
             source = chromosomes[sourceId];
         }
 
@@ -48,8 +48,9 @@ export default class Chromosome {
 
     mutate() {
         this.fitness = 0;  // reset fitness
+        var len = (this.path.length + this.config.genomeMaxSize) / 2;
 
-        for (let i = 0; i < this.path.length * this.config.insertPercent; ++i) {
+        for (let i = 0; i < len * this.config.insertPercent; ++i) {
             const pos = _.random(0, this.path.length - 1);
             const nodeId = _.random(0, this.config.nodesCount - 1);
             const node = this.config.nodes.get()[nodeId];
@@ -57,12 +58,12 @@ export default class Chromosome {
             this.path.splice(pos, 0, node);
         }
 
-        for (let i = 0; i < this.path.length * this.config.removePercent; ++i) {
+        for (let i = 0; i < len * this.config.removePercent; ++i) {
             const pos = _.random(0, this.path.length - 1);
             this.path.splice(pos, 1);
         }
 
-        for (let i = 0; i < this.path.length * this.config.replacePercent; ++i) {
+        for (let i = 0; i < len * this.config.replacePercent; ++i) {
             const pos = _.random(0, this.path.length - 1);
             const nodeId = _.random(0, this.config.nodesCount - 1);
             const node = this.config.nodes.get()[nodeId];

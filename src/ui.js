@@ -1,5 +1,5 @@
 // Bootstrap 3 doesn't support UMD properly (BS4 will do though)
-window.$ = window.jQuery = require('jquery');
+global.$ = global.jQuery = require('jquery');
 require('bootstrap');
 
 import _ from 'lodash';
@@ -22,6 +22,9 @@ export default class UI {
         this.$start = $('#start');
         this.$step = $('#step');
         this.$burst = $('#burst');
+        this.$stepsCount = $('#stepsCount');
+
+        this.$stepsCount.click((e) => false);
 
         this.$start.click(this.start.bind(this));
         this.$step.click(this.step.bind(this));
@@ -49,7 +52,8 @@ export default class UI {
             insertPercent: 0.5,
             removePercent: 0.5,
             replacePercent: 0.5,
-            genomeMaxSize: ''
+            genomeMaxSize: '',
+            mutateDuplicates: 'yes'
         };
         this.renderConfig(this.defaultConfig);
     }
@@ -114,6 +118,8 @@ export default class UI {
         this.edges.on('*', () => this.genetic.recalcFitness());
 
         this.unhighlight();
+        this.$stepsCount.text('Steps: 0');
+
         console.log('Genetic object created');
     }
 
@@ -151,6 +157,8 @@ export default class UI {
                 this.edges.update(edge);
             }
         });
+
+        this.$stepsCount.text('Steps: ' + this.genetic.stepsCount);
     }
 
     burst(count) {

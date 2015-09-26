@@ -6,6 +6,9 @@ export default class Net {
     }
 
     getEdgeCost(from, to) {
+        if (from == to)
+            return 0;
+
         var edge = this.getEdge(from, to);
         if (edge)
             return edge.cost;

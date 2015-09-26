@@ -11,3 +11,8 @@
     height: 80%;
     overflow: auto;
  }
+
+.plot {
+    width: 400px;
+    height: 400px;
+}
