@@ -25,30 +25,16 @@ export default class Chromosome {
         var result = new Chromosome(this.config, true);
         var chromosomes = [this, another];
 
-        // copy positions
-        chromosomes[0].pos = 0;
-        chromosomes[1].pos = 0;
-
         var sourceId = _.random(0, 1);
         var source = chromosomes[sourceId];
 
-        var minLen = _.min([this.path.length, another.path.length]);
-        var maxLen = _.max([this.path.length, another.path.length]);
-
-        var resultLen = _.random(minLen, maxLen);
-
-        while (result.path.length < resultLen) {
-            var partLen = _.random(0, resultLen);
-            if (partLen + result.path.length > resultLen)
-                partLen -= resultLen - result.path.length;
-
-            var sourceRestLen = source.path.length - source.pos;
-
-            if (partLen > sourceRestLen)
-                partLen = sourceRestLen;
-
-            for (let i = 0; i < partLen; ++i) {
-                result.path.push(source.path[source.pos++]);
+        var segmentsCount = this.config.segmentsCount;
+        for (let i = 0; i < segmentsCount; ++i) {
+            var segmentSize = source.path.length / segmentsCount;
+            for (let j = 0; j < segmentSize; ++j) {
+                var node = source.path[i * segmentSize + j];
+                if (node)
+                    result.path.push(node);
             }
 
             sourceId = +!sourceId;

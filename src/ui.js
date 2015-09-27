@@ -52,6 +52,7 @@ export default class UI {
             insertPercent: 0.5,
             removePercent: 0.5,
             replacePercent: 0.5,
+            segmentsCount: 4,
             genomeMaxSize: '',
             mutateDuplicates: 'yes'
         };
