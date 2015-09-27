@@ -53,6 +53,7 @@ export default class UI {
             removePercent: 0.5,
             replacePercent: 0.5,
             segmentsCount: 4,
+            genomeMinSize: '',
             genomeMaxSize: '',
             mutateDuplicates: 'yes'
         };
@@ -86,6 +87,8 @@ export default class UI {
 
     start() {
         var config = this.getConfig();
+        this.config = _.clone(config);
+
         config.edges = this.edges;
         config.nodes = this.nodes;
 

@@ -10,7 +10,7 @@ export default class Chromosome {
             return;
 
         // random genome
-        var genomeSize = _.random(0, config.genomeMaxSize);
+        var genomeSize = _.random(+config.genomeMinSize, config.genomeMaxSize);
         for (let i = 0; i < genomeSize; ++i) {
             do {
                 var nodeId = _.random(0, config.nodesCount - 1);
@@ -33,8 +33,12 @@ export default class Chromosome {
             var segmentSize = source.path.length / segmentsCount;
             for (let j = 0; j < segmentSize; ++j) {
                 var node = source.path[i * segmentSize + j];
-                if (node)
+                if (node) {
                     result.path.push(node);
+                } else {
+                    sourceId = +!sourceId;
+                    source = chromosomes[sourceId];
+                }
             }
 
             sourceId = +!sourceId;
@@ -48,7 +52,8 @@ export default class Chromosome {
         this.fitness = 0;  // reset fitness
         var len = (this.path.length + this.config.genomeMaxSize) / 2;
 
-        for (let i = 0; i < len * this.config.insertPercent; ++i) {
+        var insertCount = _.random(0, len * this.config.insertPercent);
+        for (let i = 0; i < insertCount; ++i) {
             const pos = _.random(0, this.path.length - 1);
             const nodeId = _.random(0, this.config.nodesCount - 1);
             const node = this.config.nodes.get()[nodeId];
@@ -56,12 +61,14 @@ export default class Chromosome {
             this.path.splice(pos, 0, node);
         }
 
-        for (let i = 0; i < len * this.config.removePercent; ++i) {
+        var removeCount = _.random(0, len * this.config.removePercent);
+        for (let i = 0; i < removeCount; ++i) {
             const pos = _.random(0, this.path.length - 1);
             this.path.splice(pos, 1);
         }
 
-        for (let i = 0; i < len * this.config.replacePercent; ++i) {
+        var replaceCount = _.random(0, len * this.config.replacePercent);
+        for (let i = 0; i < replaceCount; ++i) {
             const pos = _.random(0, this.path.length - 1);
             const nodeId = _.random(0, this.config.nodesCount - 1);
             const node = this.config.nodes.get()[nodeId];

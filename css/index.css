@@ -8,9 +8,15 @@
 }
 
 .log {
-    height: 80%;
+    height: 86%;
     overflow: auto;
  }
+
+.config {
+    height: 86%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
 
 .plot {
     width: 400px;
