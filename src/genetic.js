@@ -40,7 +40,9 @@ export default class Genetic {
     }
 
     step(visualize) {
-        this.population = Genetic.sort(this.population);
+        if (this.stepsCount == 0)
+            this.population = Genetic.sort(this.population);
+
         visualize(this.population);
 
         let children = [];
@@ -81,7 +83,7 @@ export default class Genetic {
                 ++childId;
             } else {
                 newPopulation.push(ch1);
-                if (parentId > this.config.selectionCount) {
+                if (parentId >= this.config.selectionCount) {
                     ch1.mutate();
                     ch1.evalFitness(this);
                 }
