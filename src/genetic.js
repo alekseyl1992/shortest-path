@@ -16,16 +16,39 @@ export default class Genetic {
         }
     }
 
+    static sort(population) {
+        return _.sortByAll(population, [
+            (ch) => ch.fitness.cost,
+            (ch) => ch.fitness.gapesCount,
+            (ch) => ch.path.length
+        ]);
+    }
+
+    static compare(ch1, ch2) {
+        if (_.isUndefined(ch1))
+            return true;
+        if (_.isUndefined(ch2))
+            return false;
+
+        if (ch1.fitness.cost != ch2.fitness.cost)
+            return ch1.fitness.cost > ch2.fitness.cost;
+
+        if (ch1.fitness.gapesCount != ch2.fitness.gapesCount)
+            return ch1.fitness.gapesCount > ch2.fitness.gapesCount;
+
+        return ch1.path.length > ch2.path.length;
+    }
+
     step(visualize) {
-        this.population = _.sortByAll(this.population, ['fitness', (ch) => ch.path.length ]);
+        this.population = Genetic.sort(this.population);
         visualize(this.population);
 
         let children = [];
         let has = (population, newCh) => _.any(population, (ch) => _.eq(ch.path, newCh.path));
 
         for (let i = 0; i < this.config.crossoversCount; ++i) {
-            var ch1 = _.random(0, this.config.selectionCount - 1);
-            var ch2 = _.random(0, this.config.selectionCount - 1);
+            let ch1 = _.random(0, this.config.selectionCount - 1);
+            let ch2 = _.random(0, this.config.selectionCount - 1);
 
             let child = this.population[ch1].crossover(this.population[ch2]);
 
@@ -42,25 +65,28 @@ export default class Genetic {
             children.push(child);
         }
 
-        children = _.sortByAll(children, ['fitness', (ch) => ch.path.length ]);
+        children = Genetic.sort(children);
 
         // merge sort
         let newPopulation = [];
         let parentId = 0;
         let childId = 0;
 
-
         while (newPopulation.length < this.population.length) {
-            if (childId >= children.length ||
-                this.population[parentId].fitness < children[childId].fitness) {
+            let ch1 = this.population[parentId];
+            let ch2 = children[childId];
 
-                let ch = this.population[parentId];
-                newPopulation.push(ch);
-                ++parentId;
-            } else {
-                let ch = children[childId];
-                newPopulation.push(ch);
+            if (Genetic.compare(ch1, ch2)) {
+                newPopulation.push(ch2);
                 ++childId;
+            } else {
+                newPopulation.push(ch1);
+                if (parentId > this.config.selectionCount) {
+                    ch1.mutate();
+                    ch1.evalFitness(this);
+                }
+
+                ++parentId;
             }
         }
 

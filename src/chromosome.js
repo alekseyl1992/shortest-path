@@ -4,7 +4,8 @@ export default class Chromosome {
     constructor(config, empty) {
         this.config = config;
         this.path = [];
-        this.fitness = 0;
+
+        this.fitness = null;
 
         if (empty)
             return;
@@ -49,7 +50,8 @@ export default class Chromosome {
     }
 
     mutate() {
-        this.fitness = 0;  // reset fitness
+        this.fitness = null;
+
         var len = (this.path.length + this.config.genomeMaxSize) / 2;
 
         var insertCount = _.random(0, len * this.config.insertPercent);
@@ -81,13 +83,20 @@ export default class Chromosome {
         if (this.fitness && !noCache)
             return this.fitness;
 
-        this.fitness = 0;
+        this.fitness = {
+            cost: 0,
+            gapesCount: 0
+        };
+
         var from = this.config.from;
         for (let i = 0; i < this.path.length; ++i) {
             var to = this.path[i];
 
             let cost = genetic.net.getEdgeCost(from, to);
-            this.fitness += cost;
+            this.fitness.cost += cost;
+
+            if (cost == Infinity)
+                ++this.fitness.gapesCount;
 
             from = to;
         }
@@ -95,7 +104,11 @@ export default class Chromosome {
         // add last path part
         to = this.config.to;
         let cost = genetic.net.getEdgeCost(from, to);
-        this.fitness += cost;
+        this.fitness.cost += cost;
+        if (cost == Infinity)
+            ++this.fitness.gapesCount;
+
+        this.fitness.gapesCount = Math.floor(this.fitness.gapesCount * 100 / (this.path.length + 2));
 
         return this.fitness;
     }
