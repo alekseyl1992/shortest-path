@@ -89,6 +89,11 @@ export default class UI {
         var config = this.getConfig();
         this.config = _.clone(config);
 
+        if (!config.from || !config.to) {
+            alertify.error('From or To fields are missed<br>Fill them with nodes\' names');
+            return;
+        }
+
         config.edges = this.edges;
         config.nodes = this.nodes;
 

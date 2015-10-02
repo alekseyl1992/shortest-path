@@ -1,4 +1,22 @@
 
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.main-container {
+    padding: 0;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.row {
+    margin: 0;
+    padding: 0;
+}
+
 .log__fitness {
     width: 30%;
 }
@@ -8,17 +26,35 @@
 }
 
 .log {
-    height: 86%;
+    height: 85%;
     overflow: auto;
  }
 
 .config {
-    height: 86%;
-    overflow-x: hidden;
+    height: 85%;
+    overflow-x: auto;
     overflow-y: auto;
+}
+
+.config__table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}
+
+.config__input {
+    width: 90%;
 }
 
 .plot {
     width: 400px;
     height: 400px;
+}
+
+.author {
+    color: gray;
+    font-size: smaller;
+
+    position: fixed;
+    left: 8px;
+    bottom: 8px;
 }
